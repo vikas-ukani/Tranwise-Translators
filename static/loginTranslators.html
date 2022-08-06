@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Tranwise 3</title>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+        <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+        <style>
+            #login-page-wrapper {
+                width: 100%;
+                height: 100%;
+                background-color: rgb(35, 68, 88);
+            }
+
+            .column {
+                max-width: 450px;
+                margin-top: 3%;
+            }
+
+            #main-box {
+                padding: 30px;
+            }
+
+            .card {
+                border-radius: 10px !important;
+                -webkit-box-shadow: none;
+                box-shadow: 0px 0px 58px -9px rgba(0, 0, 0, 0.54) !important;
+            }
+
+            .button-wrapper {
+                text-align: center;
+                padding-top: 7px;
+            }
+
+            #login-button,
+            #register-button {
+                padding-left: 40px;
+                padding-right: 40px;
+            }
+
+            #title {
+                font-size: 23pt;
+                font-weight: 700;
+                padding: 30px 0;
+                text-align: center;
+                background-color: #0e6eb8;
+                border-radius: 10px 10px 0 0 !important;
+                color: white;
+            }
+
+            #logging-in {
+                text-align: center;
+                font-size: 15px;
+                color: white;
+            }
+
+            #chrome-warning,
+            #mobile-warning {
+                color: rgb(235, 22, 22);
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .chrome-warning-header {
+                text-align: center;
+                font-size: 18px;
+                font-weight: 700;
+                line-height: 150%;
+                color: rgb(248, 111, 20);
+            }
+
+            #agreement {
+                max-width: 600px;
+                width: 600px;
+                margin: 30px auto;
+                padding: 30px;
+                border-radius: 10px;
+                background-color: white;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="login-page-wrapper">
+            <div class="ui centered grid container">
+                <div class="column">
+                    <div id="logging-in" style="display: none;">Logging in...</div>
+                    <div class="ui fluid card transition hidden">
+                        <div id="title">TRANWISE 3</div>
+                        <div id="main-box" class="content center">
+                            <div class="ui middle aligned form">
+                                <div id="mobile-warning" style="display: none;">
+                                    <div class="chrome-warning-header">Warning!</div>
+                                    Tranwise is not supported on mobile. For the best experience, please use it with Chrome for desktop (Windows, Mac, Linux).
+                                </div>
+                                <div id="chrome-warning" style="display: none;">
+                                    For the best experience, please use Tranwise with the Chrome browser for desktop (Windows, Mac, Linux).
+                                </div>
+                                <div class="field">
+                                    <div class="ui left icon input"><input type="text" id="username" placeholder="Username" /> <i class="user icon"></i></div>
+                                </div>
+                                <div class="field">
+                                    <div class="ui left icon input"><input type="password" id="password" placeholder="Password" /> <i class="user icon"></i></div>
+                                </div>
+                                <div class="two fields">
+                                    <div class="field" style="margin-top: 5px;">
+                                        <div class="ui checkbox"><input type="checkbox" name="remember" id="remember-checkbox" /> <label>Keep me signed in</label></div>
+                                    </div>
+                                    <div class="field" style="margin-top: 5px;">
+                                        <a href="ResetPassword">Forgot your password?</a>
+                                    </div>
+                                </div>
+                                <div class="button-wrapper"><button class="ui primary button transition" id="login-button">Login</button></div>
+                                <h6 class="ui dividing header"></h6>
+                                <div class="field" style="text-align: center;">
+                                    If you don't have a Tranwise account, register below.
+                                </div>
+                                <div class="button-wrapper">
+                                    <a href="https://translators.tranwise.com/Register"><button class="ui button violet transition" id="register-button">Register</button></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui icon warning message hidden" id="login-failed">
+                        <i class="lock icon"></i>
+                        <div class="content">
+                            <div class="header">Login failed</div>
+                            <p id="login-failed-text">Please try again.</p>
+                        </div>
+                    </div>
+                    <div class="ui icon warning message hidden" id="connection-failed">
+                        <i class="lock icon"></i>
+                        <div class="content">
+                            <div class="header">Can not connect to the server</div>
+                            <p>Please try again.</p>
+                        </div>
+                    </div>
+                    <div class="ui icon warning message hidden" id="pending-account">
+                        <div class="content">
+                            <div class="header">Your account is pending review</div>
+                            <p>You will receive an email when it's approved.</p>
+                        </div>
+                    </div>
+                    <div class="ui icon warning message hidden" id="suspended-account">
+                        <div class="content">
+                            <div class="header">Your account has been suspended</div>
+                            <p>Please contact support.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        // The code is found in loginTranslators.js (it's stored in a separate file so we can minify it)
+    </script>
+</html>

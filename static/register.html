@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tranwise</title>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+        <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+        <style>
+            body {
+                background-color: rgb(35, 68, 88);
+            }
+
+            #app {
+                width: 580px;
+                margin: 40px auto;
+                border-radius: 10px;
+                background-color: white;
+            }
+
+            #main {
+                padding: 30px;
+            }
+
+            #header {
+                background-color: rgb(58, 97, 122);
+                color: white;
+                font-size: 35px;
+                font-weight: 700;
+                text-align: center;
+                padding: 40px;
+                border-radius: 9px 9px 0 0;
+            }
+
+            .translation-area {
+                margin-bottom: 10px;
+            }
+
+            .mandatory-error {
+                background-color: rgb(253, 246, 244) !important;
+                border-color: rgb(231, 122, 122) !important;
+            }
+
+            #response-error {
+                padding: 10px 0;
+                color: rgb(182, 31, 31);
+            }
+
+            #response-success {
+                padding: 40px;
+                font-size: 16px;
+            }
+
+            td {
+                padding: 6px 10px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="app">
+            <div id="header">TRANWISE</div>
+            <div v-if="didSucceed" id="response-success">
+                <p>
+                    Thank you for your registration!
+                </p>
+                <p>
+                    Your account is pending review. You will receive an email when your account has been approved.
+                </p>
+            </div>
+            <div v-else class="ui form" style="padding: 40px;">
+                <div class="field">
+                    Please fill in the information below in order to register for an account in Tranwise.
+                </div>
+                <div class="ui dividing header">Account</div>
+                <div class="field">
+                    <input type="text" :class="{'mandatory-error': highlightMandatoryFields && !username}" v-model="username" placeholder="Username" />
+                </div>
+                <div class="field">
+                    <input type="password" :class="{'mandatory-error': highlightMandatoryFields && !password}" v-model="password" placeholder="Password (min. 8 characters)" />
+                </div>
+                <div class="field">
+                    <input type="password" :class="{'mandatory-error': highlightMandatoryFields && !passwordCheck}" v-model="passwordCheck" placeholder="Verify password" />
+                </div>
+                <div class="ui dividing header">Personal details</div>
+                <div class="two fields">
+                    <div class="field">
+                        <input type="text" v-model="firstName" :class="{'mandatory-error': highlightMandatoryFields && !firstName}" placeholder="First name" />
+                    </div>
+                    <div class="field">
+                        <input type="text" v-model="lastName" :class="{'mandatory-error': highlightMandatoryFields && !lastName}" placeholder="Last name" />
+                    </div>
+                </div>
+                <div class="field">
+                    <input type="text" v-model="email" :class="{'mandatory-error': highlightMandatoryFields && (!email || !isEmailValid)}" placeholder="Email address" />
+                </div>
+                <div class="two fields">
+                    <div class="field">
+                        <select class="ui search dropdown" id="dropdown-native-language-1" v-model="nativeLanguage1">
+                            <option value="">Native language</option>
+                            <option v-for="language in languages" :value="language.PK">{{ language.LANGUAGE }}</option>
+                        </select>
+                    </div>
+                    <div class="field" v-show="nativeLanguage1">
+                        <select class="ui search dropdown" id="dropdown-native-language-2" v-model="nativeLanguage2">
+                            <option value="">Additional native language</option>
+                            <option v-for="language in languages" :value="language.PK">{{ language.LANGUAGE }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="fields">
+                        <div class="field">
+                            <button class="ui teal small button" @click="selectResumeFile">Upload your resumé</button>
+                        </div>
+                        <div class="field" style="padding-top: 7px;">{{ resumeUploadStatus }}</div>
+                        <input type="file" id="resume-input" style="display: none;" @change="uploadResume" />
+                    </div>
+                </div>
+                <div class="ui dividing header">Language pairs</div>
+                <div class="field">Select the source and target languages and click the Add button.<br />You can add multiple language pairs.</div>
+                <div class="fields">
+                    <div class="field">
+                        <select class="ui search dropdown" id="dropdown-source-language" v-model="sourceLanguage">
+                            <option value="">Source language</option>
+                            <option v-for="language in languages" :value="language.PK">{{ language.LANGUAGE }}</option>
+                        </select>
+                    </div>
+                    <div class="field" style="padding-top: 10px;">to</div>
+                    <div class="field">
+                        <select class="ui search dropdown" id="dropdown-target-language" v-model="targetLanguage">
+                            <option value="">Target language</option>
+                            <option v-for="language in languages" :value="language.PK">{{ language.LANGUAGE }}</option>
+                        </select>
+                    </div>
+                    <div class="field" style="padding-left: 0;">
+                        <button
+                            class="ui teal button"
+                            :class="{disabled: !isAddLanguagePairButtonEnabled }"
+                            style="padding-left: 18px; padding-right: 18px;"
+                            @click="addLanguagePair"
+                        >
+                            Add
+                        </button>
+                    </div>
+                </div>
+                <div id="added-language-pairs" v-if="languagePairs.length">
+                    <table style="width: 100%; border: thin solid rgb(192, 206, 219);">
+                        <thead style="background-color: rgb(243, 245, 245);">
+                            <td>Source language</td>
+                            <td>Target language</td>
+                            <td></td>
+                        </thead>
+                        <tbody>
+                            <tr v-for="pair in languagePairs">
+                                <td>{{ pair.sourceLanguage.LANGUAGE }}</td>
+                                <td>{{ pair.targetLanguage.LANGUAGE }}</td>
+                                <td style="text-align: center;">
+                                    <i class="red close icon" style="cursor: pointer;" @click="removeLanguagePair(pair.sourceLanguage.PK, pair.targetLanguage.PK)"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="ui dividing header">Additional services</div>
+                <div class="field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" class="hidden" @change="selectPhoneInterpreting" />
+                        <label>I also want to receive telephone interpreting offers</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" class="hidden" @change="selectVideoInterpreting" />
+                        <label>I also want to receive video interpreting offers</label>
+                    </div>
+                </div>
+                <div class="ui dividing header">Specific translation areas</div>
+                <div style="display: flex;">
+                    <div class="field four wide">
+                        <div class="grouped fields">
+                            <div class="ui checkbox translation-area">
+                                <input type="checkbox" tabindex="0" class="hidden" id="translationArea8" @change="selectTranslationArea(8)" />
+                                <label>Science</label>
+                            </div>
+                            <div class="ui checkbox translation-area">
+                                <input type="checkbox" tabindex="0" class="hidden" id="translationArea6" @change="selectTranslationArea(6)" />
+                                <label>Medical</label>
+                            </div>
+                            <div class="ui checkbox translation-area">
+                                <input type="checkbox" tabindex="0" class="hidden" id="translationArea7" @change="selectTranslationArea(7)" />
+                                <label>Pensions</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field five wide">
+                        <div class="grouped fields">
+                            <div class="ui checkbox translation-area">
+                                <input type="checkbox" tabindex="0" class="hidden" id="translationArea3" @change="selectTranslationArea(3)" />
+                                <label>Insurance</label>
+                            </div>
+                            <div class="ui checkbox translation-area">
+                                <input type="checkbox" tabindex="0" class="hidden" id="translationArea5" @change="selectTranslationArea(5)" />
+                                <label>Marketing</label>
+                            </div>
+                            <div class="ui checkbox translation-area">
+                                <input type="checkbox" tabindex="0" class="hidden" id="translationArea4" @change="selectTranslationArea(4)" />
+                                <label>Law / Patent</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field six wide">
+                        <div class="grouped fields">
+                            <div class="ui checkbox translation-area">
+                                <input type="checkbox" tabindex="0" class="hidden" id="translationArea2" @change="selectTranslationArea(2)" />
+                                <label>Business / Financial</label>
+                            </div>
+                            <div class="ui checkbox translation-area">
+                                <input type="checkbox" tabindex="0" class="hidden" id="translationArea1" @change="selectTranslationArea(1)" />
+                                <label>Art / Literary</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <textarea v-model="otherTranslationAreas" placeholder="Other translation areas" rows="2"></textarea>
+                </div>
+                <div class="field">
+                    <div class="ui red message" v-if="Object.keys(errors).length">
+                        <div class="header">Please correct the following errors:</div>
+                        <ul class="list">
+                            <li v-for="error in errors">{{ error }}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="response-error">{{ responseError }}</div>
+                <div class="fields" style="padding-top: 10px;">
+                    <div class="field">
+                        <button class="ui green button" @click="chat">Chat with us</button>
+                    </div>
+                    <div class="field" style="flex: 1 1 auto;"></div>
+                    <div class="field">
+                        <button class="ui primary button" :class="{ disabled: isRegisterButtonDisabled }" @click="register">Register</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            // The code is found in register.js (it's stored in a separate file so we can minify it)
+        </script>
+    </body>
+</html>

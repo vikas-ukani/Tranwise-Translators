@@ -1,0 +1,29 @@
+{
+    "name": "tranwise3server",
+    "version": "3.0.0",
+    "description": "Tranwise 3 Server",
+    "main": "server.js",
+    "author": "",
+    "license": "ISC",
+    "scripts": {
+        "dev" : "DEBUG=* nodemon server.js"
+    },
+    "dependencies": {
+        "@google-cloud/storage": "^5.13.0",
+        "@google-cloud/translate": "^6.2.6",
+        "archiver": "^3.1.1",
+        "axios": "^0.18.0",
+        "busboy": "^0.3.1",
+        "compression": "^1.7.3",
+        "cookie-parser": "^1.4.4",
+        "crypto-js": "^3.1.9-1",
+        "express": "^4.16.4",
+        "helmet": "^3.21.2",
+        "moment": "^2.24.0",
+        "mysql": "^2.16.0",
+        "nodemailer": "^6.1.1",
+        "pdfkit": "^0.11.0",
+        "request": "^2.88.0",
+        "socket.io": "^2.2.0"
+    }
+}

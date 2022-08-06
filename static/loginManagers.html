@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Tranwise 3</title>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+        <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+        <style>
+            #login-page-wrapper {
+                width: 100%;
+                height: 100%;
+                background-color: rgb(35, 68, 88);
+            }
+
+            .column {
+                max-width: 450px;
+                margin-top: 15%;
+            }
+
+            #main-box {
+                padding: 40px;
+            }
+
+            .card {
+                border-radius: 10px !important;
+                -webkit-box-shadow: none;
+                box-shadow: 0px 0px 58px -9px rgba(0, 0, 0, 0.54) !important;
+            }
+
+            #button-wrapper {
+                text-align: center;
+                padding-top: 20px;
+            }
+
+            #button-wrapper > button {
+                padding-left: 40px;
+                padding-right: 40px;
+            }
+
+            #title {
+                font-size: 30pt;
+                font-weight: 700;
+                padding: 60px 0;
+                text-align: center;
+                background-color: #0e6eb8;
+                border-radius: 10px 10px 0 0 !important;
+                color: white;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="login-page-wrapper">
+            <div class="ui centered grid container">
+                <div class="column">
+                    <div class="ui fluid card transition hidden">
+                        <div id="title">TRANWISE 3</div>
+                        <div id="main-box" class="content center">
+                            <div class="ui middle aligned form">
+                                <div class="field">
+                                    <div class="ui left icon input">
+                                        <input type="text" id="username" placeholder="Username" />
+                                        <i class="user icon"></i>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="ui left icon input">
+                                        <input type="password" id="password" placeholder="Password" />
+                                        <i class="user icon"></i>
+                                    </div>
+                                </div>
+                                <div id="button-wrapper">
+                                    <button class="ui primary button transition" id="login-button">Login</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui icon warning message hidden" id="login-failed">
+                        <i class="lock icon"></i>
+                        <div class="content">
+                            <div class="header">Login failed</div>
+                            <p>Please try again.</p>
+                        </div>
+                    </div>
+                    <div class="ui icon warning message hidden" id="connection-failed">
+                        <i class="lock icon"></i>
+                        <div class="content">
+                            <div class="header">Can not connect to the server</div>
+                            <p>Please try again.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        const appURL = window.location
+
+        function hash(r) {
+            function a(r, n) {
+                var t, o, e, u, f
+                return (
+                    (e = 2147483648 & r),
+                    (u = 2147483648 & n),
+                    (f = (1073741823 & r) + (1073741823 & n)),
+                    (t = 1073741824 & r) & (o = 1073741824 & n) ? 2147483648 ^ f ^ e ^ u : t | o ? (1073741824 & f ? 3221225472 ^ f ^ e ^ u : 1073741824 ^ f ^ e ^ u) : f ^ e ^ u
+                )
+            }
+            function n(r, n, t, o, e, u, f) {
+                return (r = a(r, a(a((n & t) | (~n & o), e), f))), a((r << u) | (r >>> (32 - u)), n)
+            }
+            function t(r, n, t, o, e, u, f) {
+                return (r = a(r, a(a((n & o) | (t & ~o), e), f))), a((r << u) | (r >>> (32 - u)), n)
+            }
+            function o(r, n, t, o, e, u, f) {
+                return (r = a(r, a(a(n ^ t ^ o, e), f))), a((r << u) | (r >>> (32 - u)), n)
+            }
+            function e(r, n, t, o, e, u, f) {
+                return (r = a(r, a(a(t ^ (n | ~o), e), f))), a((r << u) | (r >>> (32 - u)), n)
+            }
+            function u(r) {
+                var n,
+                    t = "",
+                    o = ""
+                for (n = 0; n <= 3; n++) t += (o = "0" + (o = (r >>> (8 * n)) & 255).toString(16)).substr(o.length - 2, 2)
+                return t
+            }
+            var f, i, C, c, g, h, d, m, v
+            r += 2147483648
+            for (
+                f = (function (r) {
+                    for (var n, t = r.length, o = 16 * (((n = t + 8) - (n % 64)) / 64 + 1), e = Array(o - 1), u = 0, f = 0; f < t; )
+                        (u = (f % 4) * 8), (e[(n = (f - (f % 4)) / 4)] |= r.charCodeAt(f) << u), f++
+                    return (e[(n = (f - (f % 4)) / 4)] |= 128 << ((f % 4) * 8)), (e[o - 2] = t << 3), (e[o - 1] = t >>> 29), e
+                })(
+                    (r = (function (r) {
+                        r = r.replace(/\r\n/g, "\n")
+                        for (var n = "", t = 0; t < r.length; t++) {
+                            var o = r.charCodeAt(t)
+                            o < 128
+                                ? (n += String.fromCharCode(o))
+                                : (127 < o && o < 2048
+                                      ? (n += String.fromCharCode((o >> 6) | 192))
+                                      : ((n += String.fromCharCode((o >> 12) | 224)), (n += String.fromCharCode(((o >> 6) & 63) | 128))),
+                                  (n += String.fromCharCode((63 & o) | 128)))
+                        }
+                        return n
+                    })(r))
+                ),
+                    h = 1732584193,
+                    d = 4023233417,
+                    m = 2562383102,
+                    v = 271733878,
+                    r = 0;
+                r < f.length;
+                r += 16
+            )
+                (h = n((i = h), (C = d), (c = m), (g = v), f[r + 0], 7, 3614090360)),
+                    (v = n(v, h, d, m, f[r + 1], 12, 3905402710)),
+                    (m = n(m, v, h, d, f[r + 2], 17, 606105819)),
+                    (d = n(d, m, v, h, f[r + 3], 22, 3250441966)),
+                    (h = n(h, d, m, v, f[r + 4], 7, 4118548399)),
+                    (v = n(v, h, d, m, f[r + 5], 12, 1200080426)),
+                    (m = n(m, v, h, d, f[r + 6], 17, 2821735955)),
+                    (d = n(d, m, v, h, f[r + 7], 22, 4249261313)),
+                    (h = n(h, d, m, v, f[r + 8], 7, 1770035416)),
+                    (v = n(v, h, d, m, f[r + 9], 12, 2336552879)),
+                    (m = n(m, v, h, d, f[r + 10], 17, 4294925233)),
+                    (d = n(d, m, v, h, f[r + 11], 22, 2304563134)),
+                    (h = n(h, d, m, v, f[r + 12], 7, 1804603682)),
+                    (v = n(v, h, d, m, f[r + 13], 12, 4254626195)),
+                    (m = n(m, v, h, d, f[r + 14], 17, 2792965006)),
+                    (h = t(h, (d = n(d, m, v, h, f[r + 15], 22, 1236535329)), m, v, f[r + 1], 5, 4129170786)),
+                    (v = t(v, h, d, m, f[r + 6], 9, 3225465664)),
+                    (m = t(m, v, h, d, f[r + 11], 14, 643717713)),
+                    (d = t(d, m, v, h, f[r + 0], 20, 3921069994)),
+                    (h = t(h, d, m, v, f[r + 5], 5, 3593408605)),
+                    (v = t(v, h, d, m, f[r + 10], 9, 38016083)),
+                    (m = t(m, v, h, d, f[r + 15], 14, 3634488961)),
+                    (d = t(d, m, v, h, f[r + 4], 20, 3889429448)),
+                    (h = t(h, d, m, v, f[r + 9], 5, 568446438)),
+                    (v = t(v, h, d, m, f[r + 14], 9, 3275163606)),
+                    (m = t(m, v, h, d, f[r + 3], 14, 4107603335)),
+                    (d = t(d, m, v, h, f[r + 8], 20, 1163531501)),
+                    (h = t(h, d, m, v, f[r + 13], 5, 2850285829)),
+                    (v = t(v, h, d, m, f[r + 2], 9, 4243563512)),
+                    (m = t(m, v, h, d, f[r + 7], 14, 1735328473)),
+                    (h = o(h, (d = t(d, m, v, h, f[r + 12], 20, 2368359562)), m, v, f[r + 5], 4, 4294588738)),
+                    (v = o(v, h, d, m, f[r + 8], 11, 2272392833)),
+                    (m = o(m, v, h, d, f[r + 11], 16, 1839030562)),
+                    (d = o(d, m, v, h, f[r + 14], 23, 4259657740)),
+                    (h = o(h, d, m, v, f[r + 1], 4, 2763975236)),
+                    (v = o(v, h, d, m, f[r + 4], 11, 1272893353)),
+                    (m = o(m, v, h, d, f[r + 7], 16, 4139469664)),
+                    (d = o(d, m, v, h, f[r + 10], 23, 3200236656)),
+                    (h = o(h, d, m, v, f[r + 13], 4, 681279174)),
+                    (v = o(v, h, d, m, f[r + 0], 11, 3936430074)),
+                    (m = o(m, v, h, d, f[r + 3], 16, 3572445317)),
+                    (d = o(d, m, v, h, f[r + 6], 23, 76029189)),
+                    (h = o(h, d, m, v, f[r + 9], 4, 3654602809)),
+                    (v = o(v, h, d, m, f[r + 12], 11, 3873151461)),
+                    (m = o(m, v, h, d, f[r + 15], 16, 530742520)),
+                    (h = e(h, (d = o(d, m, v, h, f[r + 2], 23, 3299628645)), m, v, f[r + 0], 6, 4096336452)),
+                    (v = e(v, h, d, m, f[r + 7], 10, 1126891415)),
+                    (m = e(m, v, h, d, f[r + 14], 15, 2878612391)),
+                    (d = e(d, m, v, h, f[r + 5], 21, 4237533241)),
+                    (h = e(h, d, m, v, f[r + 12], 6, 1700485571)),
+                    (v = e(v, h, d, m, f[r + 3], 10, 2399980690)),
+                    (m = e(m, v, h, d, f[r + 10], 15, 4293915773)),
+                    (d = e(d, m, v, h, f[r + 1], 21, 2240044497)),
+                    (h = e(h, d, m, v, f[r + 8], 6, 1873313359)),
+                    (v = e(v, h, d, m, f[r + 15], 10, 4264355552)),
+                    (m = e(m, v, h, d, f[r + 6], 15, 2734768916)),
+                    (d = e(d, m, v, h, f[r + 13], 21, 1309151649)),
+                    (h = e(h, d, m, v, f[r + 4], 6, 4149444226)),
+                    (v = e(v, h, d, m, f[r + 11], 10, 3174756917)),
+                    (m = e(m, v, h, d, f[r + 2], 15, 718787259)),
+                    (d = e(d, m, v, h, f[r + 9], 21, 3951481745)),
+                    (h = a(h, i)),
+                    (d = a(d, C)),
+                    (m = a(m, c)),
+                    (v = a(v, g))
+            return (u(h) + u(d) + u(m) + u(v)).toLowerCase()
+        }
+
+        setTimeout(() => {
+            $(".ui.card").transition("fade down")
+            $("#username").focus()
+        }, 200)
+
+        function doLogin() {
+            $("#connection-failed").addClass("hidden")
+            $("#login-failed").addClass("hidden")
+
+            const username = $("#username").val()
+            const password = $("#password").val()
+
+            if (!username || !password) {
+                if (username) $("#password").focus()
+                else $("#username").focus()
+                return
+            }
+
+            axios
+                .post(appURL, {
+                    username: username,
+                    password: hash(password)
+                })
+                .then(function (response) {
+                    if (response.status != 200) {
+                        $("#connection-failed").removeClass("hidden")
+                        return
+                    }
+
+                    if (response.data === "FAILED") {
+                        $("#password").val("")
+                        $("#login-failed").removeClass("hidden")
+                    } else postToken(response.data)
+                })
+                .catch(function (error) {
+                    $("#connection-failed").removeClass("hidden")
+                })
+        }
+
+        function postToken(loginToken) {
+            sessionStorage.setItem("t", loginToken)
+            var form = $(`<form action="${appURL}" method="post"><input type="hidden" name="t" value="${loginToken}" /></form>`)
+            $("body").append(form)
+            form.submit()
+        }
+
+        $("#password").keypress(function (e) {
+            if (e.which == 13) doLogin()
+        })
+
+        $("#login-button").click(function () {
+            doLogin()
+        })
+    </script>
+</html>

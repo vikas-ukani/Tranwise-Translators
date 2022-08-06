@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tranwise Log Viewer</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                min-height: 100%;
+            }
+
+            body {
+                font: 12px Helvetica, Arial;
+                line-height: 1.6em;
+            }
+
+            #app {
+                height: 100%;
+            }
+
+            #socket-log {
+                width: 100%;
+            }
+
+            .log-line {
+                display: flex;
+                border-bottom: thin solid #eeeeee;
+                padding: 2px;
+            }
+
+            .log-line.selected {
+                background-color: #eeeef3;
+            }
+
+            .log-time {
+                border-right: thin solid #eeeeee;
+                padding-left: 5px;
+                padding-right: 10px;
+                white-space: nowrap;
+            }
+
+            .log-text {
+                padding-left: 10px;
+                padding-right: 10px;
+                white-space: nowrap;
+            }
+
+            .log-area {
+                border-bottom: thin solid #bbbbbb;
+                overflow-x: auto;
+                overflow-y: scroll;
+            }
+
+            #grid {
+                height: 100%;
+                display: grid;
+                grid-template-rows: 2fr 1fr;
+                grid-template-columns: 50% 50%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app">
+            <div id="grid">
+                <div class="log-area" id="global-log">
+                    <div class="log-line" :class="{ selected: log.isSelected }" v-for="log in globalLogs" @click="selectLog(log, globalLogs)">
+                        <div class="log-time">{{ log.time }}</div>
+                        <div class="log-text">{{ log.text }}</div>
+                    </div>
+                </div>
+                <div class="log-area" id="mailer-log">
+                    <div class="log-line" :class="{ selected: log.isSelected }" v-for="log in mailerLogs" @click="selectLog(log, mailerLogs)">
+                        <div class="log-time">{{ log.time }}</div>
+                        <div class="log-text">{{ log.text }}</div>
+                    </div>
+                </div>
+                <div class="log-area" id="error-log">
+                    <div class="log-line" :class="{ selected: log.isSelected }" v-for="log in errorLogs" @click="selectLog(log, errorLogs)">
+                        <div class="log-time">{{ log.time }}</div>
+                        <div class="log-text">{{ log.text }}</div>
+                    </div>
+                </div>
+                <div class="log-area" id="database-log">
+                    <div class="log-line" :class="{ selected: log.isSelected }" v-for="log in databaseLogs" @click="selectLog(log, databaseLogs)">
+                        <div class="log-time">{{ log.time }}</div>
+                        <div class="log-text">{{ log.text }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            const app = new Vue({
+                el: "#app",
+                data: {
+                    mailerLogs: [],
+                    globalLogs: [],
+                    errorLogs: [],
+                    databaseLogs: []
+                },
+
+                methods: {
+                    selectLog(log, logArray) {
+                        for (let l of logArray) this.$set(l, "isSelected", l === log)
+                    }
+                }
+            })
+
+            const socket = io()
+            socket.on("LOG", log => addLog(log))
+
+            function scrollToBottom(divID) {
+                $(divID).scrollTop($(divID)[0].scrollHeight)
+            }
+
+            function addLog(log) {
+                let divID = `#${log.type.toLowerCase()}-log`
+
+                const time = log.data.slice(1, log.data.indexOf("]"))
+                const text = log.data.slice(log.data.indexOf("]") + 1)
+
+                if (log.type === "GLOBAL") app.globalLogs.push({ time, text })
+                if (log.type === "MAILER") app.mailerLogs.push({ time, text })
+                if (log.type === "MAILER-ERROR") {
+                    app.mailerLogs.push({ time, text })
+                    divID = "#mailer-log"
+                }
+                if (log.type === "DATABASE") app.databaseLogs.push({ time, text })
+                if (log.type === "ERROR") app.errorLogs.push({ time, text })
+                if (log.type === "SECURITY") {
+                    app.errorLogs.push({ time, text })
+                    divID = "#error-log"
+                }
+                if (log.type === "VALIDATION") {
+                    app.errorLogs.push({ time, text })
+                    divID = "#error-log"
+                }
+                if (log.type === "GUARDIAN") {
+                    app.errorLogs.push({ time, text })
+                    divID = "#error-log"
+                }
+
+                setTimeout(() => scrollToBottom(divID), 10)
+            }
+        </script>
+    </body>
+</html>

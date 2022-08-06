@@ -1,0 +1,23 @@
+{
+    "manifest_version": 2,
+    "name": "Tranwise Addon",
+    "description": "Tranwise Addon",
+    "version": "3.0.1",
+    "browser_action": {
+        "default_icon": "Extension-icon.png"
+    },
+    "permissions": ["downloads", "downloads.open", "storage", "idle", "activeTab"],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": true
+    },
+    "content_scripts": [
+        {
+            "matches": ["*://translators.tranwise.com/*"],
+            "js": ["content.js"]
+        }
+    ],
+    "externally_connectable": {
+        "matches": ["*://translators.tranwise.com/*"]
+    }
+}
