@@ -1,0 +1,2 @@
+# Tranwise-Translators
+Tranwise is a web application designed to allow live communication between our project managers and our translators. Project managers can create translation projects for clients, send quotes, files, invoices, receive and process Twilio messages from the clients and a lot more. Translators can view projects in their own language pairs, can reply to projects, upload files, view their payments etc.
